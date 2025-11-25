@@ -135,10 +135,10 @@
 }
 
 
-## Mood Types (from AI)
+## Mood Types 
 tired, bored, hungry, sick, energetic, relaxed, adventurous, romantic, cultural
 
-## Replan Engine Input (AI provided)
+## Replan Engine Input 
 
 {
   "sessionId": "TRIP_2025_001",
