@@ -79,8 +79,9 @@ const api = getApiClient()
 export const createSession = async (
   body?: { name?: string },
 ): Promise<{ sessionId: string }> => {
-  const response = await api.post('/createSession', body ?? {})
-  return response.data
+  const response = await api.post('/api/sessions/create', body ?? {})
+  const data = response.data as { ok?: boolean; session?: { _id?: string } }
+  return { sessionId: data.session?._id ?? '' }
 }
 
 export const updateMood = async (
@@ -90,17 +91,73 @@ export const updateMood = async (
   success: boolean
   currentMood: { mood: MoodType; updatedAt: string }
 }> => {
-  const response = await api.post('/updateMood', { sessionId, mood })
-  return response.data
+  const response = await api.post('/api/mood/update', {
+    sessionId,
+    participantId: 'p1',
+    mood,
+  })
+  const ok = (response.data as { ok?: boolean }).ok ?? true
+  return {
+    success: ok,
+    currentMood: {
+      mood,
+      updatedAt: new Date().toISOString(),
+    },
+  }
 }
 
 export const getItinerary = async (
   sessionId: string,
 ): Promise<GetItineraryResponse> => {
-  const response = await api.get('/getItinerary', {
-    params: { sessionId },
-  })
-  return response.data
+  const response = await api.get(`/api/itinerary/${sessionId}`)
+  const raw = response.data as {
+    ok?: boolean
+    itinerary?: Array<{
+      id?: string
+      _id?: string
+      title?: string
+      type?: string
+      startTime?: string
+      durationMinutes?: number
+      location?: { name?: string; lat?: number; lng?: number }
+    }>
+    sessionId: string
+  }
+
+  const activities = (raw.itinerary ?? []).map((a) => ({
+    id: a.id || (a._id ?? ''),
+    name: a.title ?? 'Activity',
+    category: a.type ?? 'general',
+    startTime: a.startTime,
+    endTime: undefined,
+    durationMin: a.durationMinutes,
+    location: a.location
+      ? {
+          name: a.location.name,
+          coordinates:
+            typeof a.location.lat === 'number' && typeof a.location.lng === 'number'
+              ? { lat: a.location.lat, lng: a.location.lng }
+              : undefined,
+        }
+      : undefined,
+    description: undefined,
+    imageUrl: undefined,
+    rating: undefined,
+    cost: undefined,
+  }))
+
+  const normalized: GetItineraryResponse = {
+    sessionId: raw.sessionId,
+    days: [
+      {
+        date: new Date().toISOString().slice(0, 10),
+        activities,
+      },
+    ],
+    updatedAt: new Date().toISOString(),
+  }
+
+  return normalized
 }
 
 export const replan = async (
@@ -108,9 +165,9 @@ export const replan = async (
   activityId: string,
   selectedAlternativeId?: string,
 ): Promise<ReplanResponse> => {
-  const response = await api.post('/replan', {
+  const response = await api.post('/api/replan/propose', {
     sessionId,
-    activityId,
+    affectedBlockId: activityId,
     selectedAlternativeId,
   })
   return response.data

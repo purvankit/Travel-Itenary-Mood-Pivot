@@ -3,6 +3,8 @@ export type StoredSession = {
   id?: string
   token?: string
   name?: string
+  dateRange?: string
+  groupSize?: string
 }
 
 const STORAGE_KEY = 'travelItinerarySession'

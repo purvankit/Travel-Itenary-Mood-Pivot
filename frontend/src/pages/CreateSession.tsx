@@ -23,7 +23,13 @@ export default function CreateSessionPage() {
   })
 
   const persistAndNavigate = (sessionId: string, notice?: string) => {
-    persistSession({ sessionId, id: sessionId, name: tripName || attendeeName || undefined })
+    persistSession({
+      sessionId,
+      id: sessionId,
+      name: tripName || attendeeName || undefined,
+      dateRange: dateRange || undefined,
+      groupSize: groupSize || undefined,
+    })
     if (notice) {
       toast((t) => (
         <span className="text-sm">

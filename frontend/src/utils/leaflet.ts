@@ -7,7 +7,8 @@ let assetsPatched = false
 
 export const locateLeafletAssets = () => {
   if (assetsPatched) return
-  ;(L.Icon.Default.prototype as unknown as { _getIconUrl?: () => string })._getIconUrl = undefined
+  // Ensure Leaflet uses the configured icon URLs instead of a missing _getIconUrl implementation
+  delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: () => string })._getIconUrl
   L.Icon.Default.mergeOptions({
     iconRetinaUrl: marker2x,
     iconUrl: marker,

@@ -6,7 +6,6 @@ import { useReplan } from '../hooks/useItinerary'
 import { getItinerary } from '../services/api'
 import { getStoredSession, persistSession, SESSION_EVENT } from '../utils/session'
 import { ItineraryList } from '../components/ItineraryList'
-import { MapView } from '../components/MapView'
 import { ItinerarySkeleton } from '../components/ItinerarySkeleton'
 import { ErrorState } from '../components/ErrorState'
 import { ReplanModal } from '../components/ReplanModal'
@@ -21,11 +20,22 @@ export default function DashboardPage() {
     ReplanSuggestion[] | undefined
   >(undefined)
   const [isReplanModalOpen, setIsReplanModalOpen] = useState(false)
+  const storedSession = getStoredSession()
+  const tripDateRange = storedSession?.dateRange
+  const tripGroupSize = storedSession?.groupSize
 
   useEffect(() => {
     const urlSessionId = searchParams.get('sessionId') ?? undefined
     if (urlSessionId) {
-      persistSession({ sessionId: urlSessionId, id: urlSessionId })
+      // Preserve any existing stored session metadata (name, dateRange, groupSize)
+      const existing = getStoredSession()
+      persistSession({
+        sessionId: urlSessionId,
+        id: urlSessionId,
+        name: existing?.name,
+        dateRange: existing?.dateRange,
+        groupSize: existing?.groupSize,
+      })
       setSessionId(urlSessionId)
       return
     }
@@ -191,15 +201,12 @@ export default function DashboardPage() {
             ))}
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-[1.1fr,0.9fr]">
+          <div className="grid gap-8">
             <ItineraryList
               activities={activities}
               onSuggestAlternative={handleSuggestAlternative}
-            />
-            <MapView
-              activities={activities}
-              onSuggestAlternative={handleSuggestAlternative}
-              isReplanning={replanMutation.isPending}
+              tripDateRange={tripDateRange}
+              tripGroupSize={tripGroupSize}
             />
           </div>
         </div>

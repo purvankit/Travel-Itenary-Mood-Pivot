@@ -1,13 +1,15 @@
 import { motion } from 'framer-motion'
 import type { Activity } from '../types/api'
-import { Clock3, MapPin, Sparkles } from 'lucide-react'
+import { Clock3, Sparkles } from 'lucide-react'
 
 type ItineraryListProps = {
   activities: Activity[]
   onSuggestAlternative: (activityId: string) => void
+  tripDateRange?: string
+  tripGroupSize?: string
 }
 
-export function ItineraryList({ activities, onSuggestAlternative }: ItineraryListProps) {
+export function ItineraryList({ activities, onSuggestAlternative, tripDateRange, tripGroupSize }: ItineraryListProps) {
   if (!activities.length) {
     return (
       <div className="rounded-3xl border border-dashed border-white/10 bg-white/5 p-10 text-center text-white/60">
@@ -28,9 +30,6 @@ export function ItineraryList({ activities, onSuggestAlternative }: ItineraryLis
         >
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-white/50">
-                {activity.category}
-              </p>
               <h3 className="font-display text-2xl text-white">{activity.name}</h3>
             </div>
             <button
@@ -42,24 +41,15 @@ export function ItineraryList({ activities, onSuggestAlternative }: ItineraryLis
             </button>
           </div>
           <div className="mt-4 flex flex-wrap gap-6 text-sm text-white/70">
-            {activity.startTime && (
+            {tripDateRange && (
               <span className="inline-flex items-center gap-2">
                 <Clock3 className="h-4 w-4" />
-                {new Date(activity.startTime).toLocaleTimeString([], {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-                {activity.endTime &&
-                  ` – ${new Date(activity.endTime).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}`}
+                {tripDateRange}
               </span>
             )}
-            {activity.location?.name && (
+            {tripGroupSize && (
               <span className="inline-flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
-                {activity.location.name}
+                👥 {tripGroupSize} people
               </span>
             )}
             {typeof activity.rating === 'number' && (

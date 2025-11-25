@@ -9,7 +9,17 @@ router.post('/update', async (req, res) => {
   const { sessionId, participantId, mood } = req.body;
   if (!sessionId || !participantId || !mood) return res.status(400).json({ ok:false, err:'missing fields' });
   try {
-    const log = await MoodLog.create({ sessionId, participantId, mood });
+    // Normalize frontend mood labels to backend enum: ok | tired | sick
+    let normalizedMood = mood;
+    if (mood === 'tired' || mood === 'sick') {
+      normalizedMood = mood;
+    } else {
+      // All other moods (relaxed, energetic, adventurous, romantic, cultural, etc.)
+      // are treated as "ok" from the backend's perspective
+      normalizedMood = 'ok';
+    }
+
+    const log = await MoodLog.create({ sessionId, participantId, mood: normalizedMood });
 
     // compute current mood ratio for tired|sick
     const logs = await MoodLog.find({ sessionId }).sort({ timestamp: -1 }).limit(500);
