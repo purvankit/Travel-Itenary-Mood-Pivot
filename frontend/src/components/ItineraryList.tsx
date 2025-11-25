@@ -55,7 +55,7 @@ export function ItineraryList({
                     )
                   }
                 >
-                  Edit items
+                 + Add plans
                 </button>
               )}
               <button

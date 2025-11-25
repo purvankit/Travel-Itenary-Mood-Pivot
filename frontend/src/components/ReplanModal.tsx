@@ -93,7 +93,7 @@ export function ReplanModal({
                               Replace which item?
                             </span>
                             <select
-                              className="rounded-lg border border-white/20 bg-black/40 px-4 py-2 text-sm text-white focus:border-brand focus:outline-none"
+                              className="min-w-[280px] rounded-lg border border-white/20 bg-black/40 px-4 py-2 text-sm text-white focus:border-brand focus:outline-none"
                               value={
                                 selectedIndex === null || selectedIndex === undefined
                                   ? '0'
