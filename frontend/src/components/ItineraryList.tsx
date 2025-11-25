@@ -7,9 +7,16 @@ type ItineraryListProps = {
   onSuggestAlternative: (activityId: string) => void
   tripDateRange?: string
   tripGroupSize?: string
+  onEditItems?: (activityId: string, items: string[]) => void
 }
 
-export function ItineraryList({ activities, onSuggestAlternative, tripDateRange, tripGroupSize }: ItineraryListProps) {
+export function ItineraryList({
+  activities,
+  onSuggestAlternative,
+  tripDateRange,
+  tripGroupSize,
+  onEditItems,
+}: ItineraryListProps) {
   if (!activities.length) {
     return (
       <div className="rounded-3xl border border-dashed border-white/10 bg-white/5 p-10 text-center text-white/60">
@@ -32,13 +39,29 @@ export function ItineraryList({ activities, onSuggestAlternative, tripDateRange,
             <div>
               <h3 className="font-display text-2xl text-white">{activity.name}</h3>
             </div>
-            <button
-              className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/40 hover:text-white"
-              onClick={() => onSuggestAlternative(activity.id)}
-            >
-              <Sparkles className="h-4 w-4 text-brand" />
-              Suggest alternative
-            </button>
+            <div className="flex gap-2">
+              {onEditItems && (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/40 hover:text-white"
+                  onClick={() =>
+                    onEditItems(
+                      activity.id,
+                      activity.items?.map((i) => i.text) ?? [],
+                    )
+                  }
+                >
+                  Edit items
+                </button>
+              )}
+              <button
+                className="inline-flex items-center gap-2 rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/40 hover:text-white"
+                onClick={() => onSuggestAlternative(activity.id)}
+              >
+                <Sparkles className="h-4 w-4 text-brand" />
+                Suggest alternative
+              </button>
+            </div>
           </div>
           <div className="mt-4 flex flex-wrap gap-6 text-sm text-white/70">
             {tripDateRange && (
@@ -63,6 +86,13 @@ export function ItineraryList({ activities, onSuggestAlternative, tripDateRange,
               </span>
             )}
           </div>
+          {activity.items && activity.items.length > 0 && (
+            <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-white/80">
+              {activity.items.map((item) => (
+                <li key={item.id}>{item.text}</li>
+              ))}
+            </ul>
+          )}
           {activity.description && (
             <p className="mt-3 text-sm text-white/60">{activity.description}</p>
           )}

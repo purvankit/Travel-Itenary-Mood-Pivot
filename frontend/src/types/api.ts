@@ -16,6 +16,11 @@ export interface ActivityLocation {
   coordinates?: Coordinates
 }
 
+export interface ActivityItem {
+  id: string
+  text: string
+}
+
 export interface Activity {
   id: string
   name: string
@@ -28,6 +33,7 @@ export interface Activity {
   durationMin?: number
   rating?: number
   cost?: number
+   items?: ActivityItem[]
 }
 
 export interface Day {

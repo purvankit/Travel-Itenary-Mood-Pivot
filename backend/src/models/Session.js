@@ -10,9 +10,16 @@ const ActivitySchema = new mongoose.Schema({
   location: {
     name: String,
     lat: Number,
-    lng: Number
+    lng: Number,
   },
-  status: { type: String, default: 'scheduled' }
+  status: { type: String, default: 'scheduled' },
+  // Per-card list of sub-items for this activity
+  items: [
+    {
+      id: { type: String, required: true },
+      text: { type: String, required: true },
+    },
+  ],
 });
 
 const SessionSchema = new mongoose.Schema({

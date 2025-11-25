@@ -120,6 +120,7 @@ export const getItinerary = async (
       startTime?: string
       durationMinutes?: number
       location?: { name?: string; lat?: number; lng?: number }
+      items?: { id?: string; text?: string }[]
     }>
     sessionId: string
   }
@@ -144,6 +145,12 @@ export const getItinerary = async (
     imageUrl: undefined,
     rating: undefined,
     cost: undefined,
+    items: (a.items ?? [])
+      .map((item, index) => ({
+        id: item.id || `item-${index + 1}`,
+        text: item.text ?? '',
+      }))
+      .filter((item) => item.text.trim().length > 0),
   }))
 
   const normalized: GetItineraryResponse = {
@@ -158,6 +165,41 @@ export const getItinerary = async (
   }
 
   return normalized
+}
+
+export const saveItinerary = async (sessionId: string, titles: string[]) => {
+  const itinerary = titles
+    .filter((title) => title.trim().length > 0)
+    .map((title, index) => ({
+      id: `act-${index + 1}`,
+      title,
+      type: 'custom',
+      status: 'scheduled',
+    }))
+
+  const response = await api.put(`/api/sessions/${sessionId}/itinerary`, {
+    itinerary,
+  })
+
+  return response.data
+}
+
+export const saveActivityItems = async (
+  sessionId: string,
+  activityId: string,
+  texts: string[],
+) => {
+  const items = texts
+    .map((text) => text.trim())
+    .filter((text) => text.length > 0)
+    .map((text, index) => ({ id: `item-${index + 1}`, text }))
+
+  const response = await api.put(
+    `/api/sessions/${sessionId}/itinerary/${activityId}/items`,
+    { items },
+  )
+
+  return response.data
 }
 
 export const replan = async (

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useReplan } from '../hooks/useItinerary'
-import { getItinerary } from '../services/api'
+import { getItinerary, saveActivityItems } from '../services/api'
 import { getStoredSession, persistSession, SESSION_EVENT } from '../utils/session'
 import { ItineraryList } from '../components/ItineraryList'
 import { ItinerarySkeleton } from '../components/ItinerarySkeleton'
@@ -20,9 +20,12 @@ export default function DashboardPage() {
     ReplanSuggestion[] | undefined
   >(undefined)
   const [isReplanModalOpen, setIsReplanModalOpen] = useState(false)
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null)
+  const [draftItems, setDraftItems] = useState<string[]>([])
   const storedSession = getStoredSession()
   const tripDateRange = storedSession?.dateRange
   const tripGroupSize = storedSession?.groupSize
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const urlSessionId = searchParams.get('sessionId') ?? undefined
@@ -93,6 +96,40 @@ export default function DashboardPage() {
 
   const activities = selectedDay?.activities ?? []
 
+  const startEditingItems = (activityId: string, existingItems: string[]) => {
+    setEditingActivityId(activityId)
+    setDraftItems(existingItems.length ? existingItems : [''])
+  }
+
+  const handleDraftItemChange = (index: number, value: string) => {
+    setDraftItems((prev) => {
+      const next = [...prev]
+      next[index] = value
+      return next
+    })
+  }
+
+  const addDraftItemRow = () => {
+    setDraftItems((prev) => [...prev, ''])
+  }
+
+  const removeDraftItemRow = (index: number) => {
+    setDraftItems((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const saveDraftItems = async () => {
+    if (!sessionId || !editingActivityId) return
+    try {
+      await saveActivityItems(sessionId, editingActivityId, draftItems)
+      await queryClient.invalidateQueries({ queryKey: ['itinerary', sessionId] })
+      toast.success('Items saved.')
+      setEditingActivityId(null)
+    } catch (error) {
+      const message = (error as { message?: string })?.message ?? 'Failed to save items.'
+      toast.error(message)
+    }
+  }
+
   const handleSuggestAlternative = (activityId: string) => {
     replanMutation.mutate(
       { activityId },
@@ -147,19 +184,15 @@ export default function DashboardPage() {
     <div className="space-y-10">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm uppercase tracking-[0.3em] text-brand-muted">
-            Live itinerary
-          </p>
+          <p className="text-sm uppercase tracking-[0.3em] text-brand-muted">Live itinerary</p>
           <h1 className="font-display text-4xl text-white">Pivot control center</h1>
           <p className="text-white/60">
-            Watch the itinerary, map, and suggestions react as moods change.
+            Watch the itinerary and suggestions react as moods change.
           </p>
         </div>
         {itineraryQuery.data?.currentMood && (
           <div className="rounded-2xl border border-white/10 bg-white/5 px-6 py-4 text-sm text-white">
-            <p className="text-xs uppercase tracking-[0.3em] text-white/50">
-              Current mood
-            </p>
+            <p className="text-xs uppercase tracking-[0.3em] text-white/50">Current mood</p>
             <p className="mt-1 text-lg font-semibold">
               {itineraryQuery.data.currentMood.mood}
             </p>
@@ -181,6 +214,54 @@ export default function DashboardPage() {
 
       {!itineraryQuery.isLoading && !itineraryQuery.isError && (
         <div className="space-y-8">
+          {editingActivityId && (
+            <div className="space-y-4 rounded-3xl border border-white/10 bg-white/5 p-6 text-sm text-white/80">
+              <p className="text-base font-semibold text-white">Edit items for this stop</p>
+              <div className="space-y-3">
+                {draftItems.map((value, index) => (
+                  <div key={index} className="flex gap-2">
+                    <input
+                      className="w-full rounded-2xl border border-white/10 bg-black/30 px-3 py-2 text-white placeholder:text-white/30 focus:border-brand focus:outline-none"
+                      placeholder="e.g. Walk by the river, Try local snack"
+                      value={value}
+                      onChange={(e) => handleDraftItemChange(index, e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="rounded-full border border-white/20 px-3 py-2 text-xs text-white/70 hover:border-red-400 hover:text-red-300"
+                      onClick={() => removeDraftItemRow(index)}
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  className="rounded-full border border-dashed border-white/30 px-4 py-2 text-xs font-semibold text-white/70 hover:border-white/60"
+                  onClick={addDraftItemRow}
+                >
+                  + Add item
+                </button>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-brand-glow hover:bg-brand-hover"
+                  onClick={saveDraftItems}
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  className="rounded-full border border-white/20 px-4 py-2 text-sm font-semibold text-white/70 hover:border-white/40 hover:text-white"
+                  onClick={() => setEditingActivityId(null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
           <div className="flex flex-wrap gap-3">
             {itineraryQuery.data?.days?.map((day, index) => (
               <button
@@ -207,6 +288,7 @@ export default function DashboardPage() {
               onSuggestAlternative={handleSuggestAlternative}
               tripDateRange={tripDateRange}
               tripGroupSize={tripGroupSize}
+              onEditItems={startEditingItems}
             />
           </div>
         </div>

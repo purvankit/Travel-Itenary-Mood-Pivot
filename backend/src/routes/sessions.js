@@ -57,6 +57,43 @@ router.post('/create', async (req, res) => {
   }
 });
 
+// PUT /api/sessions/:sessionId/itinerary/:activityId/items
+router.put('/:sessionId/itinerary/:activityId/items', async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ ok: false, err: 'items must be an array' });
+    }
+
+    const session = await Session.findById(req.params.sessionId);
+    if (!session) {
+      return res.status(404).json({ ok: false, err: 'session not found' });
+    }
+
+    const activity = session.itinerary.find(
+      (a) => String(a.id) === req.params.activityId || String(a._id) === req.params.activityId,
+    );
+
+    if (!activity) {
+      return res.status(404).json({ ok: false, err: 'activity not found' });
+    }
+
+    activity.items = items
+      .map((item, index) => ({
+        id: item.id || `item-${index + 1}`,
+        text: String(item.text || '').trim(),
+      }))
+      .filter((i) => i.text.length > 0);
+
+    await session.save();
+
+    return res.json({ ok: true, session });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ ok: false, err: err.message });
+  }
+});
+
 // GET /api/sessions/:id
 router.get('/:id', async (req, res) => {
   try {
@@ -65,6 +102,28 @@ router.get('/:id', async (req, res) => {
     res.json({ ok:true, session });
   } catch(err) {
     res.status(500).json({ ok:false, err: err.message });
+  }
+});
+
+// PUT /api/sessions/:id/itinerary
+router.put('/:id/itinerary', async (req, res) => {
+  try {
+    const { itinerary } = req.body;
+    if (!Array.isArray(itinerary)) {
+      return res.status(400).json({ ok: false, err: 'itinerary must be an array' });
+    }
+
+    const session = await Session.findByIdAndUpdate(
+      req.params.id,
+      { itinerary },
+      { new: true },
+    );
+
+    if (!session) return res.status(404).json({ ok: false, err: 'not found' });
+
+    res.json({ ok: true, session });
+  } catch (err) {
+    res.status(500).json({ ok: false, err: err.message });
   }
 });
 
