@@ -137,19 +137,33 @@ function replanEngine(input) {
       message: "The current activity is already suitable for the group's mood."
     };
   }
-
-  // Filter dataset by allowed types
-  let candidates = POI_DATA.filter((poi) =>
-    allowedTypes.includes(poi.type)
-  );
-
   // Soft constraints
   const maxDist = constraints?.maxDistanceKm || 8;
   const minRating = constraints?.minRating || 4.0;
 
-  candidates = candidates.filter(
-    (poi) => poi.distanceKm <= maxDist && poi.rating >= minRating
+  // Step 1: Filter candidates
+let candidates = POI_DATA.filter((poi) =>
+  allowedTypes.includes(poi.type) &&
+  poi.distanceKm <= maxDist &&
+  poi.rating >= minRating
+);
+
+// 🔥 Fallback A: No candidates? Try only low-fatigue relaxing activities
+if (candidates.length === 0) {
+  candidates = POI_DATA.filter(poi =>
+    ["spa", "relax", "cafe"].includes(poi.type)
   );
+}
+
+// 🔥 Fallback B: Still empty? Try any POI with fatigue ≤ 2
+if (candidates.length === 0) {
+  candidates = POI_DATA.filter(poi => poi.fatigueLevel <= 2);
+}
+
+// 🔥 Fallback C: Absolute fallback → pick the closest POI
+if (candidates.length === 0) {
+  candidates = [...POI_DATA].sort((a, b) => a.distanceKm - b.distanceKm).slice(0, 5);
+}
 
   // Score all candidates
   const scored = candidates.map((poi) => ({
