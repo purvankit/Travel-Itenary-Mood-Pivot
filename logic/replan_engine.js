@@ -77,32 +77,47 @@ function filterByMood(dominantMood, currentSlot) {
 // Score POIs (distance + fatigue + rating + mood fit)
 // -----------------------------------------------------------------------------
 function scorePOI(poi, dominantMood) {
+
+  // -------------------------
+  // 1) Distance Score (1–5)
+  // -------------------------
   let distanceScore =
-    poi.distanceKm <= 2
-      ? 5
-      : poi.distanceKm <= 4
-      ? 4
-      : poi.distanceKm <= 7
-      ? 3
-      : poi.distanceKm <= 10
-      ? 2
-      : 1;
+    poi.distanceKm <= 2 ? 5 :
+    poi.distanceKm <= 4 ? 4 :
+    poi.distanceKm <= 7 ? 3 :
+    poi.distanceKm <= 10 ? 2 : 1;
 
-  let fatigueScore =
-    dominantMood === "tired"
-      ? 6 - poi.fatigueLevel // low fatigue = high score
-      : poi.fatigueLevel; // energetic → high fatigue is okay
-
+  // -------------------------
+  // 2) Rating Score (1–5)
+  // -------------------------
   let ratingScore = poi.rating;
 
-  let moodMatchScore = 0;
-  if (dominantMood === "tired" && poi.type === "spa") moodMatchScore = 2;
-  if (dominantMood === "hungry" && (poi.type === "cafe" || poi.type === "dinner"))
-    moodMatchScore = 2;
-  if (dominantMood === "bored" && poi.type === "fun") moodMatchScore = 2;
+  // -------------------------
+  // 3) FatigueMatch Score (+2 if type fits mood)
+  // -------------------------
+  let fatigueMatchScore = 0;
 
-  return distanceScore + fatigueScore + ratingScore + moodMatchScore;
+  if (dominantMood === "tired" && ["spa", "relax", "cafe", "park"].includes(poi.type))
+    fatigueMatchScore = 2;
+
+  if (dominantMood === "bored" && ["fun", "indoor", "scenic"].includes(poi.type))
+    fatigueMatchScore = 2;
+
+  if (dominantMood === "hungry" && ["cafe", "dinner"].includes(poi.type))
+    fatigueMatchScore = 2;
+
+  if (dominantMood === "sick" && ["relax", "spa", "museum"].includes(poi.type))
+    fatigueMatchScore = 2;
+
+  if (dominantMood === "energetic" && ["hike", "fun", "indoor"].includes(poi.type))
+    fatigueMatchScore = 2;
+
+  // ---------------------------------------------------------
+  // FINAL SCORE = distanceScore + ratingScore + fatigueMatchScore
+  // ---------------------------------------------------------
+  return distanceScore + ratingScore + fatigueMatchScore;
 }
+
 
 // -----------------------------------------------------------------------------
 // Main Replan Engine
