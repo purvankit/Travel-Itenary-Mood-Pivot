@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { ArrowRight, RefreshCcw, SmilePlus, Users } from 'lucide-react'
+import { ArrowRight, RefreshCcw, SmilePlus, Users, MapPin, Sparkles } from 'lucide-react'
 
 export default function HomePage() {
   return (
@@ -62,34 +62,54 @@ export default function HomePage() {
         >
           <div className="rounded-2xl border border-white/10 bg-black/30 p-6">
             <p className="text-sm uppercase tracking-[0.3em] text-brand-muted">
-              Live status
+              How it works
             </p>
             <h3 className="mt-3 font-display text-2xl text-white">
-              NYC Mood Board
+              Three simple steps
             </h3>
             <div className="mt-6 space-y-4">
               {[
-                { label: 'Energy', value: 'High', icon: SmilePlus },
-                { label: 'Group size', value: '6 friends', icon: Users },
-                { label: 'Next pivot in', value: '14 min', icon: RefreshCcw },
-              ].map(({ label, value, icon: Icon }) => (
+                { 
+                  step: '1', 
+                  label: 'Create your trip', 
+                  description: 'Set up a session and invite your group', 
+                  icon: MapPin 
+                },
+                { 
+                  step: '2', 
+                  label: 'Log moods in real-time', 
+                  description: 'Everyone shares how they feel', 
+                  icon: SmilePlus 
+                },
+                { 
+                  step: '3', 
+                  label: 'Get smart alternatives', 
+                  description: 'Instantly swap activities to match the vibe', 
+                  icon: Sparkles 
+                },
+              ].map(({ step, label, description, icon: Icon }) => (
                 <div
-                  key={label}
-                  className="flex items-center justify-between rounded-2xl border border-white/5 bg-white/5 px-4 py-3 text-sm text-white/70"
+                  key={step}
+                  className="rounded-2xl border border-white/5 bg-white/5 p-4"
                 >
-                  <div className="flex items-center gap-3">
-                    <span className="rounded-xl bg-white/10 p-2 text-brand">
-                      <Icon className="h-4 w-4" />
+                  <div className="flex items-start gap-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand/20 text-lg font-bold text-brand">
+                      {step}
                     </span>
-                    {label}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <Icon className="h-4 w-4 text-brand" />
+                        <p className="font-semibold text-white">{label}</p>
+                      </div>
+                      <p className="mt-1 text-sm text-white/60">{description}</p>
+                    </div>
                   </div>
-                  <span className="font-medium text-white">{value}</span>
                 </div>
               ))}
             </div>
             <p className="mt-6 text-sm text-white/60">
-              Dashboard mock panels update when moods change, hinting at the
-              interactive experience you&apos;ll craft next.
+              No more compromises. Mood Pivot keeps everyone happy by adapting
+              your itinerary to match the group&apos;s energy.
             </p>
           </div>
         </motion.div>
