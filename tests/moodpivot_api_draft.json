@@ -1,0 +1,52 @@
+{
+	"info": {
+		"_postman_id": "0f47bc4a-0ffc-4622-a512-7a416638408d",
+		"name": "Mood Pivot",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "50332393",
+		"_collection_link": "https://purvankit-3939810.postman.co/workspace/1e7f1b67-9272-4c55-828e-30bbd3205dc8/collection/50332393-0f47bc4a-0ffc-4622-a512-7a416638408d?action=share&source=collection_link&creator=50332393"
+	},
+	"item": [
+		{
+			"name": "createSession",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "createSession",
+					"host": [
+						"createSession"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateMood",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": ""
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getItinerary",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "replan",
+			"request": {
+				"method": "POST",
+				"header": []
+			},
+			"response": []
+		}
+	]
+}
