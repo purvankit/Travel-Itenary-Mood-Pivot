@@ -8,6 +8,7 @@ type ItineraryListProps = {
   tripDateRange?: string
   tripGroupSize?: string
   onEditItems?: (activityId: string, items: string[]) => void
+  tripName?: string
 }
 
 export function ItineraryList({
@@ -16,6 +17,7 @@ export function ItineraryList({
   tripDateRange,
   tripGroupSize,
   onEditItems,
+  tripName,
 }: ItineraryListProps) {
   if (!activities.length) {
     return (
@@ -37,7 +39,13 @@ export function ItineraryList({
         >
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h3 className="font-display text-2xl text-white">{activity.name}</h3>
+              <h3 className="font-display text-2xl text-white">
+                {tripName || activity.name}
+              </h3>
+              {/* Show the specific activity name so pivots are visible even when trip name is stable */}
+              {tripName && (
+                <p className="mt-1 text-sm text-white/70">{activity.name}</p>
+              )}
             </div>
             <div className="flex gap-2">
               {onEditItems && (

@@ -14,15 +14,32 @@ const POI_DATA = JSON.parse(
 // Utility: Calculate % distribution of moods
 // -----------------------------------------------------------------------------
 function getDominantMood(moodStats) {
-  const total = Object.values(moodStats).reduce((a, b) => a + b, 0);
+  const entries = Object.entries(moodStats || {});
+  // Fallback: no mood logs yet → treat as relaxed 100%
+  if (!entries.length) {
+    return {
+      dominant: "relaxed",
+      percentages: { relaxed: 100 },
+    };
+  }
+
+  const total = entries.reduce((sum, [, value]) => sum + value, 0);
+
+  // Guard against divide-by-zero
+  if (!total) {
+    return {
+      dominant: "relaxed",
+      percentages: { relaxed: 100 },
+    };
+  }
 
   const percentages = {};
-  for (const mood in moodStats) {
-    percentages[mood] = (moodStats[mood] / total) * 100;
+  for (const [mood, value] of entries) {
+    percentages[mood] = (value / total) * 100;
   }
 
   // Pick mood with highest %
-  let dominant = Object.keys(percentages).reduce((a, b) =>
+  const dominant = Object.keys(percentages).reduce((a, b) =>
     percentages[a] > percentages[b] ? a : b
   );
 
@@ -37,39 +54,53 @@ function filterByMood(dominantMood, currentSlot) {
 
   switch (dominantMood) {
     case "tired":
-      allowedTypes = ["spa", "cafe", "relax", "park", "museum", "indoor"];
-      break;
-
-    case "bored":
-      allowedTypes = ["fun", "indoor", "scenic", "park"];
-      break;
-
-    case "hungry":
-      allowedTypes = ["cafe", "dinner"];
-      break;
-
-    case "sick":
-      allowedTypes = ["relax", "spa", "cafe", "museum"];
+      // Very low-effort recovery stops
+      allowedTypes = ["spa", "relax", "cafe"];
       break;
 
     case "energetic":
-      allowedTypes = ["hike", "fun", "indoor"];
+      // High-energy, playful activities
+      allowedTypes = ["fun", "indoor"];
       break;
 
     case "relaxed":
-      allowedTypes = ["park", "cafe", "relax", "museum"];
+      // Gentle, quiet spaces
+      allowedTypes = ["relax", "park"];
+      break;
+
+    case "romantic":
+      // Date-night style: dinners & scenic views
+      allowedTypes = ["dinner", "scenic"];
+      break;
+
+    case "cultural":
+      // Strong focus on museums and culture
+      allowedTypes = ["museum"];
+      break;
+
+    // Frontend: adventurous → bolder outdoors
+    case "adventurous":
+      allowedTypes = ["hike", "scenic"];
+      break;
+
+    case "bored":
+      allowedTypes = ["fun", "park"];
+      break;
+
+    case "hungry":
+      allowedTypes = ["dinner", "cafe"];
+      break;
+
+    case "sick":
+      allowedTypes = ["spa", "relax"];
       break;
 
     default:
       allowedTypes = ["cafe", "park", "relax"];
   }
 
-  // If current activity already fits → no need to replace
-  if (allowedTypes.includes(currentSlot.activityType)) {
-    return [];
-  }
-
-  // Return acceptable types
+  // Always return acceptable types. Even if the current activity already fits,
+  // we still want to propose alternative options for the user.
   return allowedTypes;
 }
 
@@ -129,14 +160,6 @@ function replanEngine(input) {
 
   const allowedTypes = filterByMood(dominant, currentSlot);
 
-  // If no change needed
-  if (allowedTypes.length === 0) {
-    return {
-      sessionId,
-      status: "no_change",
-      message: "The current activity is already suitable for the group's mood."
-    };
-  }
   // Soft constraints
   const maxDist = constraints?.maxDistanceKm || 8;
   const minRating = constraints?.minRating || 4.0;

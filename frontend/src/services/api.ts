@@ -202,16 +202,39 @@ export const saveActivityItems = async (
   return response.data
 }
 
-export const replan = async (
+export const fetchReplanProposals = async (
   sessionId: string,
   activityId: string,
-  selectedAlternativeId?: string,
-): Promise<ReplanResponse> => {
+) => {
   const response = await api.post('/api/replan/propose', {
     sessionId,
     affectedBlockId: activityId,
-    selectedAlternativeId,
+  })
+  return response.data as { ok?: boolean; proposals?: unknown[] }
+}
+
+export const applyReplanAlternative = async (
+  sessionId: string,
+  activityId: string,
+  alternativeId: string,
+) => {
+  const response = await api.post('/api/replan/apply', {
+    sessionId,
+    affectedBlockId: activityId,
+    alternativeId,
   })
   return response.data
 }
+
+// Convenience wrapper matching the simpler fetchReplan(sessionId) shape
+// used in some examples: triggers the replan engine without a specific block.
+export const fetchReplan = async (sessionId: string): Promise<ReplanResponse> => {
+  const response = await api.post('/api/replan/propose', {
+    sessionId,
+    affectedBlockId: null,
+  })
+  return response.data as ReplanResponse
+}
+
+export default api
 

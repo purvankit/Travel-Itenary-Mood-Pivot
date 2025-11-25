@@ -3,7 +3,12 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useReplan } from '../hooks/useItinerary'
-import { getItinerary, saveActivityItems } from '../services/api'
+import {
+  applyReplanAlternative,
+  fetchReplanProposals,
+  getItinerary,
+  saveActivityItems,
+} from '../services/api'
 import { getStoredSession, persistSession, SESSION_EVENT } from '../utils/session'
 import { ItineraryList } from '../components/ItineraryList'
 import { ItinerarySkeleton } from '../components/ItinerarySkeleton'
@@ -20,9 +25,11 @@ export default function DashboardPage() {
     ReplanSuggestion[] | undefined
   >(undefined)
   const [isReplanModalOpen, setIsReplanModalOpen] = useState(false)
+  const [replanTargetActivityId, setReplanTargetActivityId] = useState<string | null>(null)
   const [editingActivityId, setEditingActivityId] = useState<string | null>(null)
   const [draftItems, setDraftItems] = useState<string[]>([])
   const storedSession = getStoredSession()
+  const tripName = storedSession?.name
   const tripDateRange = storedSession?.dateRange
   const tripGroupSize = storedSession?.groupSize
   const queryClient = useQueryClient()
@@ -130,38 +137,54 @@ export default function DashboardPage() {
     }
   }
 
-  const handleSuggestAlternative = (activityId: string) => {
-    replanMutation.mutate(
-      { activityId },
-      {
-        onSuccess: (response) => {
-          if (response.suggestions?.length) {
-            setReplanSuggestions(response.suggestions)
-            setIsReplanModalOpen(true)
-          } else {
-            toast.success('Itinerary updated based on mood shift.')
-          }
-        },
-        onError: (error: { message?: string }) => {
-          toast.error(error?.message ?? 'Unable to replan right now.')
-        },
-      },
-    )
+  const handleSuggestAlternative = async (activityId: string) => {
+    if (!sessionId) return
+    try {
+      const data = await fetchReplanProposals(sessionId, activityId)
+      const proposals = (data.proposals ?? []) as any[]
+
+      if (!proposals.length) {
+        toast('No alternatives found for this stop yet. Try another one.')
+        return
+      }
+
+      // Map the simple proposals into the ReplanSuggestion shape expected by ReplanModal
+      const originalActivity = activities.find((a) => a.id === activityId)
+      const suggestion: ReplanSuggestion = {
+        originalActivity: originalActivity ?? {
+          id: activityId,
+          name: 'Current activity',
+          category: 'general',
+        } as any,
+        suggestedAlternatives: proposals.map((p) => ({
+          id: p.id,
+          name: p.name,
+          category: p.type ?? 'general',
+        })) as any,
+      }
+
+      setReplanTargetActivityId(activityId)
+      setReplanSuggestions([suggestion])
+      setIsReplanModalOpen(true)
+    } catch (error) {
+      const message = (error as { message?: string })?.message ?? 'Unable to replan right now.'
+      toast.error(message)
+    }
   }
 
-  const handleApplyAlternative = (activityId: string, altId: string) => {
-    replanMutation.mutate(
-      { activityId, selectedAlternativeId: altId },
-      {
-        onSuccess: () => {
-          toast.success('Itinerary updated.')
-          setIsReplanModalOpen(false)
-        },
-        onError: (error: { message?: string }) => {
-          toast.error(error?.message ?? 'Failed to apply change.')
-        },
-      },
-    )
+  const handleApplyAlternative = async (activityId: string, altId: string) => {
+    const targetId = replanTargetActivityId ?? activityId
+    if (!sessionId || !targetId) return
+    try {
+      await applyReplanAlternative(sessionId, targetId, altId)
+      await queryClient.invalidateQueries({ queryKey: ['itinerary', sessionId] })
+      toast.success('Itinerary updated.')
+      setIsReplanModalOpen(false)
+      setReplanTargetActivityId(null)
+    } catch (error) {
+      const message = (error as { message?: string })?.message ?? 'Failed to apply change.'
+      toast.error(message)
+    }
   }
 
   if (sessionId === null) {
@@ -286,6 +309,7 @@ export default function DashboardPage() {
             <ItineraryList
               activities={activities}
               onSuggestAlternative={handleSuggestAlternative}
+              tripName={tripName}
               tripDateRange={tripDateRange}
               tripGroupSize={tripGroupSize}
               onEditItems={startEditingItems}
