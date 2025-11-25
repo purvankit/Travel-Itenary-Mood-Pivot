@@ -1,0 +1,61 @@
+[
+  {"id":1,"name":"Vohuman Café","type":"cafe","duration":45,"fatigueLevel":1,"distanceKm":2.1,"rating":4.6},
+  {"id":2,"name":"German Bakery Koregaon Park","type":"cafe","duration":60,"fatigueLevel":1,"distanceKm":4.5,"rating":4.5},
+  {"id":3,"name":"Waari Book Café FC Road","type":"cafe","duration":50,"fatigueLevel":1,"distanceKm":1.8,"rating":4.4},
+  {"id":4,"name":"Third Wave Coffee Baner","type":"cafe","duration":50,"fatigueLevel":1,"distanceKm":7.5,"rating":4.3},
+  {"id":5,"name":"Pagdandi Book Café Baner","type":"cafe","duration":60,"fatigueLevel":1,"distanceKm":8.0,"rating":4.7},
+
+  {"id":6,"name":"Four Fountains Spa Aundh","type":"spa","duration":75,"fatigueLevel":1,"distanceKm":6.0,"rating":4.5},
+  {"id":7,"name":"O2 Spa Phoenix Mall","type":"spa","duration":90,"fatigueLevel":1,"distanceKm":8.8,"rating":4.6},
+  {"id":8,"name":"Tattva Spa Koregaon Park","type":"spa","duration":90,"fatigueLevel":1,"distanceKm":5.7,"rating":4.7},
+  {"id":9,"name":"Leisure Spa Viman Nagar","type":"spa","duration":80,"fatigueLevel":1,"distanceKm":9.2,"rating":4.4},
+  {"id":10,"name":"Heavenly Bliss Spa Kothrud","type":"spa","duration":70,"fatigueLevel":1,"distanceKm":4.2,"rating":4.3},
+
+  {"id":11,"name":"Sinhagad Fort Trek","type":"hike","duration":210,"fatigueLevel":5,"distanceKm":32,"rating":4.8},
+  {"id":12,"name":"Lohagad Fort Trek","type":"hike","duration":240,"fatigueLevel":5,"distanceKm":52,"rating":4.9},
+  {"id":13,"name":"Rajmachi Trail","type":"hike","duration":300,"fatigueLevel":5,"distanceKm":82,"rating":4.7},
+  {"id":14,"name":"Katraj to Sinhagad Trek","type":"hike","duration":360,"fatigueLevel":5,"distanceKm":18,"rating":4.8},
+  {"id":15,"name":"Vetal Tekdi Walk","type":"hike","duration":90,"fatigueLevel":3,"distanceKm":3.1,"rating":4.6},
+
+  {"id":16,"name":"Raja Dinkar Kelkar Museum","type":"museum","duration":120,"fatigueLevel":2,"distanceKm":2.9,"rating":4.5},
+  {"id":17,"name":"Aga Khan Palace","type":"museum","duration":90,"fatigueLevel":2,"distanceKm":7.0,"rating":4.6},
+  {"id":18,"name":"Joshi Miniature Railway Museum","type":"museum","duration":75,"fatigueLevel":1,"distanceKm":5.3,"rating":4.4},
+  {"id":19,"name":"National War Memorial Southern Command","type":"museum","duration":80,"fatigueLevel":2,"distanceKm":6.2,"rating":4.7},
+  {"id":20,"name":"Pune Tribal Museum","type":"museum","duration":60,"fatigueLevel":1,"distanceKm":4.7,"rating":4.3},
+
+  {"id":21,"name":"Marz-O-Rin MG Road","type":"dinner","duration":60,"fatigueLevel":1,"distanceKm":3.5,"rating":4.4},
+  {"id":22,"name":"Arthur’s Theme KP","type":"dinner","duration":90,"fatigueLevel":1,"distanceKm":5.8,"rating":4.6},
+  {"id":23,"name":"The Flour Works Kalyani Nagar","type":"dinner","duration":80,"fatigueLevel":1,"distanceKm":8.5,"rating":4.5},
+  {"id":24,"name":"Barbeque Nation Deccan","type":"dinner","duration":120,"fatigueLevel":1,"distanceKm":2.7,"rating":4.3},
+  {"id":25,"name":"Mainland China Viman Nagar","type":"dinner","duration":90,"fatigueLevel":1,"distanceKm":9.0,"rating":4.6},
+
+  {"id":26,"name":"Pashan Lake","type":"park","duration":60,"fatigueLevel":2,"distanceKm":7.0,"rating":4.5},
+  {"id":27,"name":"Pune Okayama Friendship Garden","type":"park","duration":75,"fatigueLevel":2,"distanceKm":5.0,"rating":4.7},
+  {"id":28,"name":"Osho Teerth Park","type":"park","duration":45,"fatigueLevel":1,"distanceKm":4.8,"rating":4.6},
+  {"id":29,"name":"Saras Baug","type":"park","duration":60,"fatigueLevel":2,"distanceKm":3.4,"rating":4.4},
+  {"id":30,"name":"Empress Garden","type":"park","duration":70,"fatigueLevel":2,"distanceKm":7.2,"rating":4.5},
+
+  {"id":31,"name":"Timezone Gaming Phoenix Mall","type":"fun","duration":50,"fatigueLevel":2,"distanceKm":8.8,"rating":4.5},
+  {"id":32,"name":"Amoeba Bowling Amanora","type":"fun","duration":60,"fatigueLevel":2,"distanceKm":12.5,"rating":4.4},
+  {"id":33,"name":"Red Carpet Wax Museum Seasons Mall","type":"fun","duration":45,"fatigueLevel":1,"distanceKm":11.0,"rating":4.3},
+  {"id":34,"name":"Skyjumper Trampoline Park","type":"fun","duration":60,"fatigueLevel":4,"distanceKm":10.8,"rating":4.4},
+  {"id":35,"name":"Zensar Innovation Center VR Hub","type":"fun","duration":40,"fatigueLevel":1,"distanceKm":9.5,"rating":4.6},
+
+  {"id":36,"name":"Pune Central Mall Gaming Zone","type":"indoor","duration":40,"fatigueLevel":1,"distanceKm":3.2,"rating":4.3},
+  {"id":37,"name":"Tiger Gym Indoor Climbing","type":"indoor","duration":75,"fatigueLevel":4,"distanceKm":6.4,"rating":4.6},
+  {"id":38,"name":"Ice Skating Rink Ishanya Mall","type":"indoor","duration":90,"fatigueLevel":3,"distanceKm":8.0,"rating":4.7},
+  {"id":39,"name":"Indoor Swimming Complex Deccan","type":"indoor","duration":60,"fatigueLevel":3,"distanceKm":2.5,"rating":4.4},
+  {"id":40,"name":"Yoga House KP","type":"indoor","duration":50,"fatigueLevel":1,"distanceKm":4.7,"rating":4.8},
+
+  {"id":41,"name":"Taljai Hill Viewpoint","type":"scenic","duration":40,"fatigueLevel":2,"distanceKm":6.0,"rating":4.6},
+  {"id":42,"name":"Parvati Hill Sunset Point","type":"scenic","duration":45,"fatigueLevel":2,"distanceKm":3.3,"rating":4.7},
+  {"id":43,"name":"Riverside Promenade Koregaon Park","type":"scenic","duration":35,"fatigueLevel":1,"distanceKm":5.0,"rating":4.5},
+  {"id":44,"name":"Baner Hills Sunset Spot","type":"scenic","duration":50,"fatigueLevel":2,"distanceKm":8.0,"rating":4.6},
+  {"id":45,"name":"JM Road Skywalk Point","type":"scenic","duration":25,"fatigueLevel":1,"distanceKm":1.9,"rating":4.2},
+
+  {"id":46,"name":"British Library Pune","type":"relax","duration":60,"fatigueLevel":1,"distanceKm":3.0,"rating":4.5},
+  {"id":47,"name":"Pagdandi Reading Lounge","type":"relax","duration":55,"fatigueLevel":1,"distanceKm":8.0,"rating":4.7},
+  {"id":48,"name":"Osho Meditation Center","type":"relax","duration":60,"fatigueLevel":1,"distanceKm":4.9,"rating":4.8},
+  {"id":49,"name":"Quiet Koregaon Park Corner","type":"relax","duration":45,"fatigueLevel":1,"distanceKm":5.1,"rating":4.4},
+  {"id":50,"name":"Kalaghoda Community Art Studio","type":"relax","duration":50,"fatigueLevel":1,"distanceKm":3.8,"rating":4.6}
+]
