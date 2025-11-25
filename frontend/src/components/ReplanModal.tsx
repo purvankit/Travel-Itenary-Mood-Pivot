@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import type { ReplanSuggestion } from '../types/api'
 import { ArrowRight, MapPin, Sparkles } from 'lucide-react'
@@ -6,7 +7,7 @@ type ReplanModalProps = {
   isOpen: boolean
   suggestions?: ReplanSuggestion[]
   onClose: () => void
-  onApply: (activityId: string, alternativeId: string) => void
+  onApply: (activityId: string, alternativeId: string, replaceIndex?: number) => void
   isProcessing?: boolean
 }
 
@@ -17,6 +18,10 @@ export function ReplanModal({
   onApply,
   isProcessing,
 }: ReplanModalProps) {
+  const [replaceIndexByActivity, setReplaceIndexByActivity] = useState<
+    Record<string, number | null>
+  >({})
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -54,68 +59,111 @@ export function ReplanModal({
               </div>
             ) : (
               <div className="mt-8 space-y-6">
-                {suggestions.map((suggestion) => (
-                  <div
-                    key={suggestion.originalActivity.id}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-5"
-                  >
-                    <p className="text-sm uppercase tracking-[0.3em] text-white/50">
-                      Original
-                    </p>
-                    <div className="mt-2 flex flex-wrap items-center gap-3 text-white">
-                      <span className="font-semibold">{suggestion.originalActivity.name}</span>
-                      {suggestion.originalActivity.location?.name && (
-                        <span className="inline-flex items-center gap-1 text-sm text-white/70">
-                          <MapPin className="h-3.5 w-3.5" />
-                          {suggestion.originalActivity.location.name}
-                        </span>
-                      )}
-                    </div>
-                    {suggestion.reason && (
-                      <p className="mt-1 text-sm text-white/60">{suggestion.reason}</p>
-                    )}
+                {suggestions.map((suggestion) => {
+                  const activityId = suggestion.originalActivity.id
+                  const selectedIndex = replaceIndexByActivity[activityId] ?? null
 
-                    <div className="mt-4 grid gap-4 md:grid-cols-2">
-                      {suggestion.suggestedAlternatives.map((alternative) => (
-                        <div
-                          key={alternative.id}
-                          className="rounded-2xl border border-white/10 bg-black/30 p-4"
-                        >
-                          <div className="flex items-center gap-2 text-white">
-                            <Sparkles className="h-4 w-4 text-brand" />
-                            <p className="font-semibold">{alternative.name}</p>
+                  return (
+                    <div
+                      key={activityId}
+                      className="rounded-2xl border border-white/10 bg-white/5 p-5"
+                    >
+                      <p className="text-sm uppercase tracking-[0.3em] text-white/50">
+                        Original
+                      </p>
+                      <div className="mt-2 flex flex-wrap items-center gap-3 text-white">
+                        <span className="font-semibold">
+                          {suggestion.originalActivity.name}
+                        </span>
+                        {suggestion.originalActivity.location?.name && (
+                          <span className="inline-flex items-center gap-1 text-sm text-white/70">
+                            <MapPin className="h-3.5 w-3.5" />
+                            {suggestion.originalActivity.location.name}
+                          </span>
+                        )}
+                      </div>
+                      {suggestion.reason && (
+                        <p className="mt-1 text-sm text-white/60">{suggestion.reason}</p>
+                      )}
+
+                      {suggestion.originalActivity.items &&
+                        suggestion.originalActivity.items.length > 0 && (
+                          <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-white/70">
+                            <span className="uppercase tracking-[0.2em] text-white/50">
+                              Replace which item?
+                            </span>
+                            <select
+                              className="rounded-lg border border-white/20 bg-black/40 px-4 py-2 text-sm text-white focus:border-brand focus:outline-none"
+                              value={
+                                selectedIndex === null || selectedIndex === undefined
+                                  ? '0'
+                                  : String(selectedIndex)
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value
+                                setReplaceIndexByActivity((prev) => ({
+                                  ...prev,
+                                  [activityId]: Number(value),
+                                }))
+                              }}
+                            >
+                              {suggestion.originalActivity.items.map((item, index) => (
+                                <option key={item.id} value={index}>
+                                  {`Replace item ${index + 1}: ${item.text}`}
+                                </option>
+                              ))}
+                            </select>
                           </div>
-                          {alternative.description && (
-                            <p className="mt-2 text-sm text-white/60">
-                              {alternative.description}
-                            </p>
-                          )}
-                          <div className="mt-2 flex flex-wrap gap-4 text-xs uppercase tracking-wide text-white/50">
-                            {alternative.category && <span>{alternative.category}</span>}
-                            {alternative.startTime && (
-                              <span>
-                                {new Date(alternative.startTime).toLocaleTimeString([], {
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                })}
-                              </span>
-                            )}
-                          </div>
-                          <button
-                            className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-brand-glow transition hover:bg-brand-hover disabled:opacity-60"
-                            disabled={isProcessing}
-                            onClick={() =>
-                              onApply(suggestion.originalActivity.id, alternative.id)
-                            }
+                        )}
+
+                      <div className="mt-4 grid gap-4 md:grid-cols-2">
+                        {suggestion.suggestedAlternatives.map((alternative) => (
+                          <div
+                            key={alternative.id}
+                            className="rounded-2xl border border-white/10 bg-black/30 p-4"
                           >
-                            Apply change
-                            <ArrowRight className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ))}
+                            <div className="flex items-center gap-2 text-white">
+                              <Sparkles className="h-4 w-4 text-brand" />
+                              <p className="font-semibold">{alternative.name}</p>
+                            </div>
+                            {alternative.description && (
+                              <p className="mt-2 text-sm text-white/60">
+                                {alternative.description}
+                              </p>
+                            )}
+                            <div className="mt-2 flex flex-wrap gap-4 text-xs uppercase tracking-wide text-white/50">
+                              {alternative.category && <span>{alternative.category}</span>}
+                              {alternative.startTime && (
+                                <span>
+                                  {new Date(alternative.startTime).toLocaleTimeString([], {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                  })}
+                                </span>
+                              )}
+                            </div>
+                            <button
+                              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white shadow-brand-glow transition hover:bg-brand-hover disabled:opacity-60"
+                              disabled={isProcessing}
+                              onClick={() =>
+                                onApply(
+                                  activityId,
+                                  alternative.id,
+                                  selectedIndex === null || selectedIndex === undefined
+                                    ? undefined
+                                    : selectedIndex,
+                                )
+                              }
+                            >
+                              Apply change
+                              <ArrowRight className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </motion.div>

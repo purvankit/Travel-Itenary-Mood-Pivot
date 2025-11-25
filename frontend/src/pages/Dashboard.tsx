@@ -172,11 +172,36 @@ export default function DashboardPage() {
     }
   }
 
-  const handleApplyAlternative = async (activityId: string, altId: string) => {
+  const handleApplyAlternative = async (
+    activityId: string,
+    altId: string,
+    replaceIndex?: number,
+  ) => {
     const targetId = replanTargetActivityId ?? activityId
     if (!sessionId || !targetId) return
     try {
       await applyReplanAlternative(sessionId, targetId, altId)
+
+      // If the user chose a specific checklist item to replace, update just that item
+      if (typeof replaceIndex === 'number') {
+        const originalActivity = activities.find((a) => a.id === targetId)
+        const currentItems = originalActivity?.items ?? []
+
+        if (currentItems.length && replaceIndex >= 0 && replaceIndex < currentItems.length) {
+          // Find the chosen alternative's name from the current suggestions
+          const altName =
+            replanSuggestions
+              ?.flatMap((s) => s.suggestedAlternatives)
+              .find((a) => a.id === altId)?.name ?? currentItems[replaceIndex].text
+
+          const updatedTexts = currentItems.map((item, index) =>
+            index === replaceIndex ? altName : item.text,
+          )
+
+          await saveActivityItems(sessionId, targetId, updatedTexts)
+        }
+      }
+
       await queryClient.invalidateQueries({ queryKey: ['itinerary', sessionId] })
       toast.success('Itinerary updated.')
       setIsReplanModalOpen(false)
