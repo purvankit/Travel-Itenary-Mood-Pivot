@@ -7,11 +7,11 @@ import type { MoodType } from '../types/api'
 import { useItinerary } from '../hooks/useItinerary'
 
 const moodOptions: { label: string; value: MoodType; emoji: string; blurb: string }[] = [
-  { label: 'Relaxed', value: 'relaxed', emoji: '🌤️', blurb: 'Keep it low-key' },
+  { label: 'Relaxed', value: 'relaxed', emoji: '🌤', blurb: 'Keep it low-key' },
   { label: 'Energetic', value: 'energetic', emoji: '⚡', blurb: 'Ready to move' },
   { label: 'Adventurous', value: 'adventurous', emoji: '🧗', blurb: 'Try something bold' },
   { label: 'Romantic', value: 'romantic', emoji: '💘', blurb: 'Soft & intimate' },
-  { label: 'Cultural', value: 'cultural', emoji: '🖼️', blurb: 'Museums, galleries' },
+  { label: 'Cultural', value: 'cultural', emoji: '🖼', blurb: 'Museums, galleries' },
   { label: 'Tired', value: 'tired', emoji: '😴', blurb: 'Need a slow pace' },
 ]
 
@@ -38,17 +38,7 @@ export function MoodInput({ sessionId, isOpen, onOpenChange }: MoodInputProps) {
 
   return (
     <>
-      <motion.button
-        onClick={() => handleOpenChange(true)}
-        whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-3 rounded-full border border-white/10 bg-brand px-4 py-3 text-sm font-semibold text-white shadow-brand-glow transition hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-50"
-        disabled={!sessionId}
-      >
-        <Sparkles className="h-4 w-4" />
-        {currentMood ? `Mood: ${currentMood}` : 'Log mood'}
-      </motion.button>
-
-      <AnimatePresence>
+          <AnimatePresence>
         {actualOpen && (
           <motion.div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md px-4"
@@ -135,4 +125,3 @@ export function MoodInput({ sessionId, isOpen, onOpenChange }: MoodInputProps) {
     </>
   )
 }
-

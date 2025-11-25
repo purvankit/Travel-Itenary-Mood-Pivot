@@ -63,15 +63,7 @@ export function Navbar({ onOpenMoodModal }: NavbarProps) {
           >
             Update mood
           </motion.button>
-          <motion.div whileTap={{ scale: 0.96 }}>
-            <NavLink
-              to="/dashboard"
-              className="rounded-full bg-brand px-5 py-2 text-sm font-semibold text-white shadow-brand-glow transition hover:bg-brand-hover"
-            >
-              Launch dashboard
-            </NavLink>
-          </motion.div>
-        </div>
+      </div>
 
         <button
           className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 text-white md:hidden"
@@ -133,4 +125,3 @@ export function Navbar({ onOpenMoodModal }: NavbarProps) {
     </header>
   )
 }
-
