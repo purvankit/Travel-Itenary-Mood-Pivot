@@ -29,4 +29,15 @@ router.post('/update', async (req, res) => {
   }
 });
 
+// GET /api/mood/logs
+router.get('/logs', async (req, res) => {
+  try {
+    const logs = await MoodLog.find({}).sort({ timestamp: 1 }).limit(1000);
+    res.json({ ok: true, logs });
+  } catch(err) {
+    console.error(err);
+    res.status(500).json({ ok: false, err: err.message });
+  }
+});
+
 module.exports = router;

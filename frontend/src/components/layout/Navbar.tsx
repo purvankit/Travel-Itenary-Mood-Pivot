@@ -63,7 +63,13 @@ export function Navbar({ onOpenMoodModal }: NavbarProps) {
           >
             Update mood
           </motion.button>
-      </div>
+          <NavLink
+            to="/mood-charts"
+            className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white/80 transition hover:border-white/30 hover:text-white"
+          >
+            Mood charts
+          </NavLink>
+        </div>
 
         <button
           className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-white/10 text-white md:hidden"
@@ -110,6 +116,14 @@ export function Navbar({ onOpenMoodModal }: NavbarProps) {
               >
                 Update mood
               </button>
+
+              <NavLink
+                to="/mood-charts"
+                onClick={() => setIsOpen(false)}
+                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-center text-sm font-semibold text-white/80 hover:border-white/30 hover:text-white"
+              >
+                Mood charts
+              </NavLink>
 
               <NavLink
                 to="/dashboard"
